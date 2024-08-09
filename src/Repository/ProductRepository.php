@@ -16,6 +16,39 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function findByCriteria(array $criteria): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        if (isset($criteria['category'])) {
+            $qb->andWhere('p.category = :category')
+                ->setParameter('category', $criteria['category']);
+        }
+        if (isset($criteria['price'])) {
+            if (isset($criteria['price']['>='])) {
+                $qb->andWhere('p.price >= :minPrice')
+                    ->setParameter('minPrice', $criteria['price']['>=']);
+            }
+            if (isset($criteria['price']['<='])) {
+                $qb->andWhere('p.price <= :maxPrice')
+                    ->setParameter('maxPrice', $criteria['price']['<=']);
+            }
+        }
+        if (isset($criteria['quantity'])) {
+            if (isset($criteria['quantity']['>='])) {
+                $qb->andWhere('p.quantity >= :minQuantity')
+                    ->setParameter('minQuantity', $criteria['quantity']['>=']);
+            }
+            if (isset($criteria['quantity']['<='])) {
+                $qb->andWhere('p.quantity <= :maxQuantity')
+                    ->setParameter('maxQuantity', $criteria['quantity']['<=']);
+            }
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */

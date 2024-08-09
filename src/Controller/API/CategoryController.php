@@ -3,16 +3,13 @@
 namespace App\Controller\API;
 
 use App\Entity\Category;
-use App\Entity\User;
 use App\Repository\CategoryRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -37,7 +34,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/categories', name: 'category.create', requirements: ['id' => '\d+'], methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EDIT_2')]
     public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
@@ -53,7 +50,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/categories/{id}', name:'category.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EDIT_2')]
     public function update(Request $request, Category $category, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
@@ -70,7 +67,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/categories/{id}', name: 'category.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EDIT_2')]
     public function delete(Category $category, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($category);
