@@ -169,7 +169,7 @@ Authorization: Bearer <login-token-here>
 ```
 
 #### Roles
-This API covers three types of roles : user, edit_1, edit_2. Note that everyone can use authentification : register, login.
+This API covers four types of roles : user, edit_1, edit_2, admin. Note that everyone can use authentification : register, login.
 
 - **user(`ROLE_USER`)**:
   - **Access:** Read-only
