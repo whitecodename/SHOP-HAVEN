@@ -18,43 +18,43 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?float $price = null;
 
     #[ORM\Column]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?int $quantity = null;
 
     #[ORM\Column]
-    #[Groups(['products.index'])]
+    #[Groups(['product.index'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['products.index'])]
+    #[Groups(['product.index'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['products.index', 'products.post'])]
+    #[Groups(['product.index', 'product.post'])]
     private ?Category $category = null;
 
     /**
      * @var Collection<int, Image>
      */
-    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'product')]
-    #[Groups(['products.index'])]
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'product', fetch: 'EAGER')]
+    #[Groups(['product.index'])]
     private Collection $images;
 
     public function __construct()

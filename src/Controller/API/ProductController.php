@@ -60,7 +60,7 @@ class ProductController extends AbstractController
         $products = $productRepository->findByCriteria($criteria);
 
         return $this->json($products, Response::HTTP_OK, [], [
-            'groups' => 'products.index'
+            'groups' => 'product.index'
         ]);
     }
 
@@ -81,7 +81,7 @@ class ProductController extends AbstractController
         }, $images);
 
         $productData = $serializer->normalize($product, null, [
-            'groups' => ['products.show'],
+            'groups' => ['product.show'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['images']
         ]);
 
@@ -89,12 +89,11 @@ class ProductController extends AbstractController
         $productData['images'] = $imagesData;
 
         return $this->json($productData, Response::HTTP_OK, [], [
-            'groups' => ['products.index', 'products.show']
+            'groups' => ['product.index', 'product.show']
         ]);
     }
 
     #[Route('/api/products', name: 'product.create', requirements: ['id' => '\d+'], methods: ['POST'])]
-    #[IsGranted('ROLE_EDIT_1')]
     public function create(Request $request, CategoryRepository $categoryRepository, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
@@ -122,12 +121,11 @@ class ProductController extends AbstractController
         $em->flush();
 
         return $this->json($product, Response::HTTP_CREATED, [], [
-            'groups' => 'products.post'
+            'groups' => 'product.post'
         ]);
     }
 
     #[Route('/api/products/{id}', name: 'product.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
-    //#[IsGranted('ROLE_EDIT_1')]
     public function update(Request $request, Product $product, CategoryRepository $categoryRepository, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $data = $request->getContent();
@@ -166,13 +164,12 @@ class ProductController extends AbstractController
         $em->flush();
 
         return $this->json($product, Response::HTTP_OK, [], [
-            'groups' => 'products.post'
+            'groups' => 'product.post'
         ]);
     }
 
 
     #[Route('/api/products/{id}', name: 'product.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDIT_1')]
     public function delete(Product $product, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($product);

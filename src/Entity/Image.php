@@ -16,15 +16,16 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['images.index', 'products.index'])]
+    #[Groups(['product.index', 'image.index'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['product.index'])]
     private ?string $path = null;
 
     #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'path')]
     #[Assert\Image()]
-    #[Groups(['images.index', 'products.index'])]
+    #[Groups(['image.index', 'product.index', 'image.update'])]
     private ?File $thumbnail = null;
 
     public function getThumbnail(): ?File

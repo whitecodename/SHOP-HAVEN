@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ class UserController extends AbstractController
         return $this->json($user);
     }
 
-    #[Route('/api/users', name: 'user.create', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/api/register', name: 'user.register', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
@@ -73,11 +74,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users/{id}', name: 'user.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    public function delete(User $user, EntityManagerInterface $em): JsonResponse
+    public function delete(User $user, EntityManagerInterface $em, Security $security): JsonResponse
     {
+        // Get the currently authenticated user
+        $currentUser = $security->getUser();
+
+        // Check if the current user is the same as the user to be deleted
+        if ($currentUser !== $user) {
+            return $this->json(['error' => 'You can only delete your own account.'], Response::HTTP_FORBIDDEN);
+        }
+
         $em->remove($user);
         $em->flush();
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
+
 }

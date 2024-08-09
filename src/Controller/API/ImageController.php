@@ -10,6 +10,7 @@ use App\Repository\ImageRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use JetBrains\PhpStorm\NoReturn;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
@@ -68,11 +69,10 @@ class ImageController extends AbstractController
         return new BinaryFileResponse(new File($imagePath));
     }
 
-    #[Route('/api/products/{product_id}/images', name: 'image.upload', requirements: ['product_id' => '\d+'], methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function upload(int $product_id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    #[NoReturn] #[Route('/api/{id}/images', name: 'image.upload', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function upload(int $id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
-        $product = $productRepository->find($product_id);
+        $product = $productRepository->find($id);
         if (!$product) {
             return new JsonResponse(['error' => 'Product not found'], Response::HTTP_BAD_REQUEST);
         }
@@ -84,7 +84,7 @@ class ImageController extends AbstractController
             return new JsonResponse(['error' => 'No image file uploaded'], Response::HTTP_BAD_REQUEST);
         }
 
-        $image = new Image();
+        $image = new Image();// TODO
         $image->setProduct($product);
         $image->setThumbnail($uploadFile);
 
@@ -101,18 +101,12 @@ class ImageController extends AbstractController
         ]);
     }
 
-    #[Route('/api/products/{product_id}/images/{id}', name:'image.update', requirements: ['product_id' => '\d+', 'id' => '\d+'], methods: ['PATCH'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function update(int $product_id, Request $request, int $id, ProductRepository $productRepository, ImageRepository $imageRepository, EntityManagerInterface $em): JsonResponse
+    // TODO
+    #[NoReturn] #[Route('/api/images/{id}', name:'image.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
+    public function update(int $id, Request $request, ImageRepository $imageRepository, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        //dd($_FILES);
-
-        $product = $productRepository->find($product_id);
-        if (!$product) {
-            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_BAD_REQUEST);
-        }
-
         $image = $imageRepository->find($id);
+
         if (!$image) {
             return new JsonResponse(['error' => 'Image not found'], Response::HTTP_NOT_FOUND);
         }
@@ -133,8 +127,7 @@ class ImageController extends AbstractController
         ]);
     }
 
-    #[Route('/api/products/images/{id}', name: 'image.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/images/{id}', name: 'image.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(Image $image, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($image);

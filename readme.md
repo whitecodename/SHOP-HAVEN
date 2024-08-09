@@ -9,10 +9,12 @@ This documentation covers the usage of the API developed with Symfony. The API m
   - [Installation](#installation)
   - [Configuration](#configuration)
   - [API Routes](#api-routes)
+    - [Users](#users)
     - [Products](#products)
     - [Categories](#categories)
     - [Images](#images)
     - [Authentication](#authentication)
+    - [Documentation](#documentation)
   - [Usage Examples](#usage-examples)
   - [Contributing](#contributing)
   - [License](#license)
@@ -65,6 +67,27 @@ Make sure you have configured the following files:
 
 ## API Routes
 
+### Users
+
+- **GET /api/users**: Retrieves all users.
+
+- **GET /api/users/{id}**: Retrieves details of a specific user by ID.
+
+- **POST /api/register**: Registers a new user.
+  - JSON data example:
+    ```json
+    {
+      "username": "johndoe",
+      "email": "johndoe@example.com",
+      "password": "securepassword",
+      "roles": ["ROLE_USER"]
+    }
+    ```
+
+- **PATCH /api/users/{id}**: Updates an existing user.
+
+- **DELETE /api/users/{id}**: Deletes a user if he's the one connected.
+
 ### Products
 
 - **GET /api/products**: Retrieves all products or filters based on criteria.
@@ -87,16 +110,9 @@ Make sure you have configured the following files:
     ```
 
 - **PATCH /api/products/{id}**: Updates an existing product.
-  - JSON data example:
-    ```json
-    {
-      "name": "Updated Name",
-      "price": 18.99
-    }
-    ```
 
 - **DELETE /api/products/{id}**: Deletes a product by ID.
-
+  
 ### Categories
 
 - **GET /api/categories**: Retrieves all categories.
@@ -150,6 +166,10 @@ This API uses token-based authentication for securing endpoints. Make sure to in
 ```bash
 Authorization: Bearer <login-token-here>
 ```
+
+### Documentation
+
+This readme plays the role of the API documentation. For a simple list of the differents API routes, use the **GET /api/doc** route.
 
 ## Usage Examples
 
