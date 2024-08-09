@@ -20,12 +20,11 @@ class Image
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['product.index'])]
     private ?string $path = null;
 
     #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'path')]
     #[Assert\Image()]
-    #[Groups(['image.index', 'product.index', 'image.update'])]
+    #[Groups(['image.index', 'image.upload', 'image.update'])]
     private ?File $thumbnail = null;
 
     public function getThumbnail(): ?File

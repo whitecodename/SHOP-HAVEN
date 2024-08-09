@@ -14,6 +14,7 @@ This documentation covers the usage of the API developed with Symfony. The API m
     - [Categories](#categories)
     - [Images](#images)
     - [Authentication](#authentication)
+      - [Roles](#roles)
     - [Documentation](#documentation)
   - [Usage Examples](#usage-examples)
   - [Contributing](#contributing)
@@ -166,6 +167,39 @@ This API uses token-based authentication for securing endpoints. Make sure to in
 ```bash
 Authorization: Bearer <login-token-here>
 ```
+
+#### Roles
+This API covers three types of roles : user, edit_1, edit_2. Note that everyone can use authentification : register, login.
+
+- **user(`ROLE_USER`)**:
+  - **Access:** Read-only
+  - **Routes:**
+    - **Products:** `GET` routes
+    - **Categories:** `GET` routes
+    - **Images:** `GET` routes
+    - **Users:** Register, Update or Delete his own account
+- **edit_1(`ROLE_EDIT_1`)**:
+  - **Access:** Read, Update images, products
+  - **Routes:**
+    - **Products:** Full access
+    - **Categories:** `GET` routes
+    - **Images:** Full access
+    - **Users:** Register, Update or Delete his own account
+- **edit_2(`ROLE_EDIT_2`)**:
+  - **Access:** Read, Update images, products and categories
+  - **Routes:**
+    - **Products:** Full access
+    - **Categories:** Full access
+    - **Images:** Full access
+    - **Users:** Register, Update or Delete his own account
+- **admin(`ROLE_ADMIN`)**:
+  - **Access:** Read, Update, View users.
+  - **Routes:**
+    - **Products:** Full access
+    - **Categories:** Full access
+    - **Images:** Full access
+    - **Users:** View, Show, Change roles.
+
 
 ### Documentation
 

@@ -33,9 +33,9 @@ class CategoryController extends AbstractController
         ]);
     }
 
-    #[Route('/api/categories', name: 'category.create', requirements: ['id' => '\d+'], methods: ['POST'])]
-    #[IsGranted('ROLE_EDIT_2')]
-    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    #[Route('/api/categories', name: 'category.post', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[isGranted('ROLE_EDIT_2', 'ROLE_ADMIN')]
+    public function post(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
         $category = $serializer->deserialize($data, Category::class, 'json');
@@ -46,11 +46,13 @@ class CategoryController extends AbstractController
         $em->persist($category);
         $em->flush();
 
-        return $this->json($category, Response::HTTP_CREATED);
+        return $this->json($category, Response::HTTP_CREATED, [], [
+            'groups' => ['categories.post']
+        ]);
     }
 
     #[Route('/api/categories/{id}', name:'category.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDIT_2')]
+    #[isGranted('ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function update(Request $request, Category $category, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
@@ -63,13 +65,23 @@ class CategoryController extends AbstractController
 
         $em->flush();
 
-        return $this->json($category);
+        return $this->json($category, Response::HTTP_OK, [], [
+            'groups' => ['categories.post', 'categories.update']
+        ]);
     }
 
     #[Route('/api/categories/{id}', name: 'category.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDIT_2')]
+    #[isGranted('ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function delete(Category $category, EntityManagerInterface $em): JsonResponse
     {
+        $products = $category->getProducts();
+
+        if ($products->count() > 0) {
+            return $this->json([
+                'error' => 'Cannot delete category because it is associated with products.'
+            ], Response::HTTP_CONFLICT); // HTTP 409 Conflict
+        }
+
         $em->remove($category);
         $em->flush();
 

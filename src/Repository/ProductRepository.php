@@ -18,9 +18,7 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findByCriteria(array $criteria): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->leftJoin('p.images', 'i')
-            ->addSelect('i');
+        $qb = $this->createQueryBuilder('p');
 
         if (isset($criteria['category'])) {
             $qb->andWhere('p.category = :category')

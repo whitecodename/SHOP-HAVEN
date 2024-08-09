@@ -70,6 +70,7 @@ class ImageController extends AbstractController
     }
 
     #[NoReturn] #[Route('/api/{id}/images', name: 'image.upload', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function upload(int $id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $product = $productRepository->find($id);
@@ -103,6 +104,7 @@ class ImageController extends AbstractController
 
     // TODO
     #[NoReturn] #[Route('/api/images/{id}', name:'image.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function update(int $id, Request $request, ImageRepository $imageRepository, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
         $image = $imageRepository->find($id);
@@ -128,6 +130,7 @@ class ImageController extends AbstractController
     }
 
     #[Route('/api/images/{id}', name: 'image.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function delete(Image $image, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($image);

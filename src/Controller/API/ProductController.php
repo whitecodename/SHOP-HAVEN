@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProductController extends AbstractController
 {
     #[Route('/api/products', name:'product.index', methods: ['GET'])]
-    public function index(Request $request, ProductRepository $productRepository): JsonResponse
+    public function index(Request $request, ProductRepository $productRepository, ImageRepository $imageRepository, UrlGeneratorInterface $urlGenerator, SerializerInterface $serializer): JsonResponse
     {
         $categoryId = $request->query->get('category');
         $minPrice = $request->query->get('minPrice');
@@ -59,9 +59,35 @@ class ProductController extends AbstractController
 
         $products = $productRepository->findByCriteria($criteria);
 
-        return $this->json($products, Response::HTTP_OK, [], [
-            'groups' => 'product.index'
-        ]);
+        // Normalize and append images data
+        $productsData = [];
+        foreach ($products as $product) {
+            // Fetch images for the current product
+            $images = $imageRepository->findBy(['product' => $product]);
+
+            // Map images data
+            $imagesData = array_map(function ($image) use ($urlGenerator) {
+                $imageUrl = $urlGenerator->generate('image.show', ['id' => $image->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+                return [
+                    'id' => $image->getId(),
+                    'url' => $imageUrl,
+                ];
+            }, $images);
+
+            // Normalize product data
+            $productData = $serializer->normalize($product, null, [
+                'groups' => ['product.index', 'product.show'],
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['images']
+            ]);
+
+            // Add images data to the product data
+            $productData['images'] = $imagesData;
+
+            // Collect all product data
+            $productsData[] = $productData;
+        }
+
+        return $this->json($productsData, Response::HTTP_OK);
     }
 
     #[Route('/api/products/{id}', name: 'product.show', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -81,7 +107,7 @@ class ProductController extends AbstractController
         }, $images);
 
         $productData = $serializer->normalize($product, null, [
-            'groups' => ['product.show'],
+            'groups' => ['product.index', 'product.show'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['images']
         ]);
 
@@ -93,8 +119,9 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/api/products', name: 'product.create', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function create(Request $request, CategoryRepository $categoryRepository, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $em): JsonResponse
+    #[Route('/api/products', name: 'product.post', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
+    public function post(Request $request, CategoryRepository $categoryRepository, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $em): JsonResponse
     {
         $data = $request->getContent();
         $dataArray = json_decode($data, true);
@@ -126,6 +153,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/api/products/{id}', name: 'product.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function update(Request $request, Product $product, CategoryRepository $categoryRepository, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $data = $request->getContent();
@@ -170,6 +198,7 @@ class ProductController extends AbstractController
 
 
     #[Route('/api/products/{id}', name: 'product.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[isGranted('ROLE_EDIT_1', 'ROLE_EDIT_2', 'ROLE_ADMIN')]
     public function delete(Product $product, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($product);

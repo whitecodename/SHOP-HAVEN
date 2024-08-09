@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
@@ -22,14 +23,16 @@ class UserController extends AbstractController
         $users = $userRepository->findAll();
 
         return $this->json($users, 200, [], [
-            'groups' => 'users.index'
+            'groups' => 'user.index'
         ]);
     }
 
     #[Route('/api/users/{id}', name: 'user.show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(User $user): JsonResponse
     {
-        return $this->json($user);
+        return $this->json($user, 200, [], [
+            'groups' => 'user.index'
+        ]);
     }
 
     #[Route('/api/register', name: 'user.register', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -45,35 +48,48 @@ class UserController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return $this->json($user, Response::HTTP_CREATED);
+        return $this->json($user, Response::HTTP_CREATED, [], [
+            'groups' => 'user.register'
+        ]);
     }
 
     #[Route('/api/users/{id}', name:'user.update', requirements: ['id' => '\d+'], methods: ['PATCH'])]
-    public function update(Request $request, User $user, SerializerInterface $serializer, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): JsonResponse
+    #[isGranted('ROLE_USER')]
+    public function update(Request $request, User $user, SerializerInterface $serializer, UserPasswordHasherInterface $hasher, EntityManagerInterface $em, Security $security): JsonResponse
     {
         $data = $request->getContent();
         $updatedUser = $serializer->deserialize($data, User::class, 'json');
 
-        if ($updatedUser->getUsername()) {
-            $user->setUsername($updatedUser->getUsername());
-        }
-        if ($updatedUser->getEmail()) {
-            $user->setEmail($updatedUser->getEmail());
-        }
-        if ($updatedUser->getPassword()) {
-            $user->setPassword($hasher->hashPassword($user, $user->getPassword()));
-        }
-        if ($updatedUser->getRoles()) {
-            $user->setRoles($updatedUser->getRoles());
-        }
-        $user->setUpdatedAt(new \DateTimeImmutable());
+        // Get the currently authenticated user
+        $currentUser = $security->getUser();
 
+        // Check if the current user is the same as the user to be deleted
+        if ($currentUser === $user) {
+            if ($updatedUser->getUsername()) {
+                $user->setUsername($updatedUser->getUsername());
+            }
+            if ($updatedUser->getEmail()) {
+                $user->setEmail($updatedUser->getEmail());
+            }
+            if ($updatedUser->getPassword()) {
+                $user->setPassword($hasher->hashPassword($user, $updatedUser->getPassword()));
+            }
+        } else {
+            if ($updatedUser->getRoles()) {
+                $user->setRoles($updatedUser->getRoles());
+            }
+        }
+
+        $user->setUpdatedAt(new \DateTimeImmutable());
         $em->flush();
 
-        return $this->json($user);
+        return $this->json($user, Response::HTTP_CREATED, [], [
+            'groups' => 'user.show'
+        ]);
     }
 
     #[Route('/api/users/{id}', name: 'user.delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[isGranted('ROLE_USER')]
     public function delete(User $user, EntityManagerInterface $em, Security $security): JsonResponse
     {
         // Get the currently authenticated user

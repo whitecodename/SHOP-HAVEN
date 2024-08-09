@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="86e16984-bd4d-4771-995b-ac143ed67726" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/vich_uploader.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/vich_uploader.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/images/products/login-66b0a4952be84576127379.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/products/view-post-66b5fdbe7c1d1318685689.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/API/CategoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/API/CategoryController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/API/ImageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/API/ImageController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/API/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/API/ProductController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/API/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/API/UserController.php" afterDir="false" />

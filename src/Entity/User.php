@@ -11,36 +11,42 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username', 'email'])]
-#[Groups(['users.index'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user.index', 'user.show', 'user.register'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user.index', 'user.show', 'user.register'])]
     private ?string $username = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user.index', 'user.show', 'user.register'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['user.register', 'user.update'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user.index', 'user.show', 'user.register'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user.index', 'user.show'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['user.index', 'user.show'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
